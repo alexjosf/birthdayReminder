@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,18 +41,19 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-        NavHost(
-            navController = navController,
-            startDestination = "enterDetails",
-            modifier = Modifier.padding()
-        ) {
-            composable("home") { HomeScreen(navController) }
-            composable("enterDetails") { EnterDetails(navController) }
-        }
+    val globalData: GlobalData = viewModel()
+    NavHost(
+        navController = navController,
+        startDestination = "enterDetails",
+        modifier = Modifier.padding()
+    ) {
+        composable("home") { HomeScreen(navController, globalData) }
+        composable("enterDetails") { EnterDetails(navController, globalData) }
     }
+}
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, globalData: GlobalData) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = { SimpleFAB { navController.navigate("enterDetails") } }

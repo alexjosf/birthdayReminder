@@ -1,6 +1,7 @@
 package com.example.birthdayreminder.ui.screens
 
 import android.app.DatePickerDialog
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,10 +36,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.birthdayreminder.GlobalData
 import java.util.Calendar
 
 @Composable
-fun EnterDetails(navController: NavHostController) {
+fun EnterDetails(navController: NavHostController, globalData: GlobalData) {
     var text by remember { mutableStateOf("") }
 
     val context = LocalContext.current
@@ -57,18 +58,20 @@ fun EnterDetails(navController: NavHostController) {
             year, month, day
         )
     }
+    val finalValue = listOf(text, selectedDate)
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-        ){
+        ) {
             Row(
                 modifier = Modifier
                     .background(Color.Blue)
-                    .padding(16.dp)
+                    .padding(8.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -76,7 +79,12 @@ fun EnterDetails(navController: NavHostController) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White
+                    tint = Color.White,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            navController.navigate("home")
+                        }
                 )
                 Text(
                     text = "Enter Details",
@@ -85,7 +93,18 @@ fun EnterDetails(navController: NavHostController) {
                 Icon(
                     Icons.Default.Check,
                     contentDescription = "Submit",
-                    tint = Color.White
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable {
+                            if (text.isNotEmpty() && selectedDate.isNotEmpty()) {
+                                globalData.addText(finalValue)
+                                navController.navigate("home")
+                            }else{
+                                Toast.makeText(context, "Please enter all fields", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                 )
             }
             Column(
@@ -117,7 +136,7 @@ fun EnterDetails(navController: NavHostController) {
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     BasicTextField(
                         value = selectedDate,
                         onValueChange = {},
@@ -156,40 +175,6 @@ fun EnterDetails(navController: NavHostController) {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun DatePickerDialogDemo() {
-    val context = LocalContext.current
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-    val selectedDate = remember { mutableStateOf("") }
-    val datePickerDialog = remember {
-        DatePickerDialog(
-            context,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                selectedDate.value = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-            },
-            year, month, day
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Selected Date: ${selectedDate.value}")
-
-        Button(onClick = { datePickerDialog.show() }) {
-            Text("Select Date")
         }
     }
 }
